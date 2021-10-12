@@ -298,7 +298,7 @@ def add_probe(func):
 
 
 class ListRecursiveContentStage(ManagerSourceMixin[FsManagerType],
-                                BaseStage[FileDescriptionType]):
+                                BaseStage[FileDescriptionType, FileDescriptionType]):
     _inner_iter: Optional['ListRecursiveContentStage'] = None
     _last_fd: Optional[FileDescriptionType] = None
 
