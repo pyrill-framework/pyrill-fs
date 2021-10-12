@@ -1,3 +1,4 @@
+from functools import wraps
 from pathlib import Path
 from tempfile import mkdtemp, mkstemp
 from unittest import IsolatedAsyncioTestCase
@@ -13,17 +14,25 @@ from pyrill_fs.exceptions import FileNotReadableError, NotFileError
 from pyrill_fs.local import LocalFsManager
 
 
+def make_context(func):
+    @wraps(func)
+    async def wrapper(self):
+        async with self.manager:
+            return await func(self)
+        await self.manager.close()
+
+    return wrapper
+
+
 class BaseLocalFsManagerTestCase(IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self) -> None:
         self.manager = LocalFsManager()
 
-    async def asyncTearDown(self) -> None:
-        await self.manager.close()
-
 
 class BuildFileDescriptionTestCase(BaseLocalFsManagerTestCase):
 
+    @make_context
     async def test_build_file_description_file(self):
         fd = self.manager.build_file_description(Path(__file__).parent / 'data' / 'file_1.csv')
 
@@ -36,6 +45,7 @@ class BuildFileDescriptionTestCase(BaseLocalFsManagerTestCase):
         self.assertEqual(fd.size, 38)
         self.assertEqual(fd.uri, (Path(__file__).parent / 'data' / 'file_1.csv').resolve().as_uri())
 
+    @make_context
     async def test_build_file_description_directory(self):
         fd = self.manager.build_file_description(Path(__file__).parent / 'data')
 
@@ -48,6 +58,7 @@ class BuildFileDescriptionTestCase(BaseLocalFsManagerTestCase):
         self.assertEqual(fd.size, 0)
         self.assertEqual(fd.uri, (Path(__file__).parent / 'data').resolve().as_uri())
 
+    @make_context
     async def test_build_file_description_root_directory(self):
         fd = self.manager.build_file_description(Path('/'))
 
@@ -63,11 +74,13 @@ class BuildFileDescriptionTestCase(BaseLocalFsManagerTestCase):
 
 class ExistsTestCase(BaseLocalFsManagerTestCase):
 
+    @make_context
     async def test_success(self):
         fd = self.manager.build_file_description(Path(__file__).parent / 'data' / 'file_1.csv')
 
         self.assertTrue(await self.manager.exists(fd))
 
+    @make_context
     async def test_fail(self):
         fd = self.manager.build_file_description(Path(__file__).parent / 'data' / 'not_exists.csv')
 
@@ -76,11 +89,13 @@ class ExistsTestCase(BaseLocalFsManagerTestCase):
 
 class IsReadableTestCase(BaseLocalFsManagerTestCase):
 
+    @make_context
     async def test_success(self):
         fd = self.manager.build_file_description(Path(__file__).parent / 'data' / 'file_1.csv')
 
         self.assertTrue(await self.manager.is_readable(fd))
 
+    @make_context
     async def test_fail_not_exists(self):
         fd = self.manager.build_file_description(Path(__file__).parent / 'data' / 'not_exists.csv')
 
@@ -89,11 +104,13 @@ class IsReadableTestCase(BaseLocalFsManagerTestCase):
 
 class IsWritableTestCase(BaseLocalFsManagerTestCase):
 
+    @make_context
     async def test_success_exists(self):
         fd = self.manager.build_file_description(Path(__file__).parent / 'data' / 'file_1.csv')
 
         self.assertTrue(await self.manager.is_writable(fd))
 
+    @make_context
     async def test_success_not_exists(self):
         fd = self.manager.build_file_description(Path(__file__).parent / 'data' / 'not_exists.csv')
 
@@ -174,6 +191,7 @@ class ListContentTestCase(BaseLocalFsManagerTestCase):
 
 class ReadFileTestCase(BaseLocalFsManagerTestCase):
 
+    @make_context
     async def test_success(self):
         path = Path(__file__).parent / 'data' / 'file_1.csv'
         fd = self.manager.build_file_description(path)
@@ -184,6 +202,7 @@ class ReadFileTestCase(BaseLocalFsManagerTestCase):
 
         self.assertEqual(result, path.read_bytes())
 
+    @make_context
     async def test_fail_directory(self):
         path = Path(__file__).parent / 'data'
         fd = self.manager.build_file_description(path)
@@ -191,6 +210,7 @@ class ReadFileTestCase(BaseLocalFsManagerTestCase):
         with self.assertRaises(FileNotReadableError):
             await self.manager.read_file(fd)
 
+    @make_context
     async def test_fail_file_not_exists(self):
         path = Path(__file__).parent / 'data' / 'not_exists.csv'
         fd = self.manager.build_file_description(path)
@@ -201,6 +221,7 @@ class ReadFileTestCase(BaseLocalFsManagerTestCase):
 
 class WriteFileTestCase(BaseLocalFsManagerTestCase):
 
+    @make_context
     async def test_success(self):
         path = Path(mkstemp()[1])
         try:
@@ -212,6 +233,7 @@ class WriteFileTestCase(BaseLocalFsManagerTestCase):
         finally:
             path.unlink(missing_ok=True)
 
+    @make_context
     async def test_fail_directory(self):
         path = Path(mkdtemp())
         try:
@@ -226,6 +248,7 @@ class WriteFileTestCase(BaseLocalFsManagerTestCase):
 
 class WriteAllFilesTestCase(BaseLocalFsManagerTestCase):
 
+    @make_context
     async def test_success(self):
         path = Path(mkdtemp())
         files = [
@@ -251,6 +274,7 @@ class WriteAllFilesTestCase(BaseLocalFsManagerTestCase):
 
 class RemoveFileTestCase(BaseLocalFsManagerTestCase):
 
+    @make_context
     async def test_success_file(self):
         path = Path(mkstemp()[1])
         path.touch(exist_ok=True)
@@ -263,6 +287,7 @@ class RemoveFileTestCase(BaseLocalFsManagerTestCase):
         finally:
             path.unlink(missing_ok=True)
 
+    @make_context
     async def test_success_directory(self):
         path = Path(mkdtemp())
         path.mkdir(exist_ok=True)
@@ -282,6 +307,7 @@ class RemoveFileTestCase(BaseLocalFsManagerTestCase):
 
 class DeleteAllFilesTestCase(BaseLocalFsManagerTestCase):
 
+    @make_context
     async def test_success(self):
         path = Path(mkdtemp())
         files = [
@@ -305,6 +331,7 @@ class DeleteAllFilesTestCase(BaseLocalFsManagerTestCase):
 
 class ReadFilesTestCase(BaseLocalFsManagerTestCase):
 
+    @make_context
     async def test_success(self):
         fd = self.manager.build_file_description(Path(__file__).parent / 'data')
 

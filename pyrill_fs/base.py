@@ -206,6 +206,7 @@ class BaseFsManager(Generic[FileDescriptionType], ABC):
         if self._open_fut is not None:
             return
         self._open_fut = Future()
+        self._close_fut = None
 
         await self._context_collection.__aenter__()
         await self._prepare_contexts()
@@ -223,7 +224,6 @@ class BaseFsManager(Generic[FileDescriptionType], ABC):
     async def _close(self, exc_type=None, exc_val=None, exc_tb=None):
         await self.wait_until_finish_pendant()
         await self._context_collection.__aexit__(exc_type, exc_val, exc_tb)
-        self._close_fut = None
         self._open_fut = None
 
     async def close(self):
