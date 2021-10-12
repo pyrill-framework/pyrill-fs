@@ -23,7 +23,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install development requirements
-        run: make requirements-dev && make requirements-lint
+        run: make requirements-dev && make requirements-lint && make requirements-s3  && make requirements-hdfs
 
       - name: Flake
         run: make flake
