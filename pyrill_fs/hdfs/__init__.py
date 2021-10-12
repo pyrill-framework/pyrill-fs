@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import AsyncIterator, Dict, Final, Iterable, List, Optional, Union
 from urllib.parse import unquote, urlparse, urlunparse
 
-from pyrill import (BaseProducer, BaseSink, BaseSource, ChunksSlowStartSource,
-                    FrameSkippedError)
+from pyrill import (BaseProducer, BaseSink, BaseSource,
+                    BytesChunksSlowStartSource, FrameSkippedError)
 
 from ..base import (BaseFsManager, FileDescription, FileDescriptionMixin,
                     FileDescriptionType, ManagerSourceMixin)
@@ -181,7 +181,7 @@ class HDFSListContent(ManagerSourceMixin[HDFSManager],
 
 class HDFSFileSource(ManagerSourceMixin[HDFSManager],
                      FileDescriptionMixin[HDFSFileDescription],
-                     ChunksSlowStartSource):
+                     BytesChunksSlowStartSource):
     _fd: Optional[AsyncIterator[bytes]] = None
 
     async def _next_chunk(self) -> bytes:

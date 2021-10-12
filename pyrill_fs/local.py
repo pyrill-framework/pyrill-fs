@@ -5,7 +5,7 @@ from typing import BinaryIO, Final, Iterator, Optional, Union
 from urllib.parse import urlparse
 
 from pyrill import (BaseConsumer, BaseProducer, BaseSink, BaseSource,
-                    ChunksSlowStartSource)
+                    BytesChunksSlowStartSource)
 
 from .base import (BaseFsManager, FileDescription, FileDescriptionMixin,
                    ManagerSourceMixin)
@@ -125,7 +125,7 @@ class LocalListContent(ManagerSourceMixin[LocalFsManager],
 
 class LocalFileSource(ManagerSourceMixin[LocalFsManager],
                       FileDescriptionMixin[LocalFileDescription],
-                      ChunksSlowStartSource):
+                      BytesChunksSlowStartSource):
     _fd: Optional[BinaryIO] = None
 
     async def _next_chunk(self) -> bytes:

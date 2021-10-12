@@ -6,7 +6,7 @@ from urllib.parse import unquote, urlparse, urlunparse
 import aiobotocore
 from aiobotocore.client import AioBaseClient
 from pyrill import (BaseConsumer, BaseProducer, BaseSink, BaseSource,
-                    ChunksSlowStart, ChunksSlowStartSource)
+                    BytesChunksSlowStart, BytesChunksSlowStartSource)
 
 from .base import (BaseFsManager, FileDescription, FileDescriptionMixin,
                    FileDescriptionType, ManagerSourceMixin)
@@ -99,7 +99,7 @@ class S3FsManager(BaseFsManager[S3FileDescription]):
                           fd: S3FileDescription,
                           stream: BaseProducer[bytes]):
         sink = stream \
-            >> ChunksSlowStart(min_size=1024 * 1024 * 5, max_size=1024 * 1024 * 50) \
+            >> BytesChunksSlowStart(min_size=1024 * 1024 * 5, max_size=1024 * 1024 * 50) \
             >> S3FileSink(file_description=fd, manager=self)
 
         sink.consume_all()
@@ -267,7 +267,7 @@ class S3ListContent(ManagerSourceMixin[S3FsManager],
 
 class S3FileSource(ManagerSourceMixin[S3FsManager],
                    FileDescriptionMixin[S3FileDescription],
-                   ChunksSlowStartSource):
+                   BytesChunksSlowStartSource):
     _fd: Optional[AsyncIterator[bytes]] = None
 
     async def _next_chunk(self) -> bytes:

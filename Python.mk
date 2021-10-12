@@ -91,7 +91,7 @@ flake:
 
 run-tests:
 	@echo "Running unit tests..."
-	nosetests -v --with-coverage --cover-min-percentage=${COVER_MIN_PERCENTAGE} --cover-package=${PACKAGE_COVERAGE} -x -s
+	nosetests -v --with-coverage --cover-min-percentage=${COVER_MIN_PERCENTAGE} --cover-package=${PACKAGE_COVERAGE} -x
 
 prepush: flake run-tests
 
