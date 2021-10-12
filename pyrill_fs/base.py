@@ -246,7 +246,7 @@ class ManagerSourceMixin(Generic[FsManagerType]):
         self.manager = manager
 
 
-class ManagerProbe(ManagerSourceMixin, Noop[Source_co, Source_co]):
+class ManagerProbe(ManagerSourceMixin, Noop[Source_co]):
     _fut: Optional[Future] = None
 
     def __init__(self, *args, **kwargs):
