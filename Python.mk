@@ -23,7 +23,7 @@ endif
 
 
 # Minimum coverage
-COVER_MIN_PERCENTAGE=65
+COVER_MIN_PERCENTAGE=50
 
 # Recipes ************************************************************************************
 .PHONY: run-tests build clean beautify publish requirements all-requirements \
