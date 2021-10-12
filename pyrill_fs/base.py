@@ -106,7 +106,7 @@ class BaseFsManager(Generic[FileDescriptionType], ABC):
         source = await self._list_content(fd) >> ManagerProbe(manager=self)
 
         if recursive:
-            return source >> ListRecursiveContentStage[FileDescriptionType](manager=self)
+            return source >> ListRecursiveContentStage[self.__class__, FileDescriptionType](manager=self)
         return source
 
     @abstractmethod
