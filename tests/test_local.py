@@ -109,9 +109,9 @@ class ListContentTestCase(BaseLocalFsManagerTestCase):
             stream = await self.manager.list_content(fd)
             result = [f.full_path async for f in stream]
 
-        self.assertEqual(result,
-                         [(Path(__file__).parent / 'data' / 'file_1.csv').resolve(),
-                          (Path(__file__).parent / 'data' / 'file_2.csv').resolve()])
+        self.assertEqual(sorted(result),
+                         sorted([(Path(__file__).parent / 'data' / 'file_1.csv').resolve(),
+                                 (Path(__file__).parent / 'data' / 'file_2.csv').resolve()]))
 
     async def test_success_file(self):
         fd = self.manager.build_file_description(Path(__file__).parent / 'data' / 'file_1.csv')
@@ -147,18 +147,18 @@ class ListContentTestCase(BaseLocalFsManagerTestCase):
             base_path / 'inner_dir_2' / 'file_2.csv'
             base_path / 'inner_dir_2' / 'inner_dir_3'
             base_path / 'inner_dir_2'
-        self.assertEqual(result,
-                         [base_path / 'file_1.csv',
-                          base_path / 'file_2.csv',
-                          base_path / 'inner_dir_1' / 'file_1.csv',
-                          base_path / 'inner_dir_1' / 'file_2.csv',
-                          base_path / 'inner_dir_1',
-                          base_path / 'inner_dir_2' / 'file_1.csv',
-                          base_path / 'inner_dir_2' / 'file_2.csv',
-                          base_path / 'inner_dir_2' / 'inner_dir_3' / 'file_1.csv',
-                          base_path / 'inner_dir_2' / 'inner_dir_3' / 'file_2.csv',
-                          base_path / 'inner_dir_2' / 'inner_dir_3',
-                          base_path / 'inner_dir_2'],
+        self.assertEqual(sorted(result),
+                         sorted([base_path / 'file_1.csv',
+                                 base_path / 'file_2.csv',
+                                 base_path / 'inner_dir_1' / 'file_1.csv',
+                                 base_path / 'inner_dir_1' / 'file_2.csv',
+                                 base_path / 'inner_dir_1',
+                                 base_path / 'inner_dir_2' / 'file_1.csv',
+                                 base_path / 'inner_dir_2' / 'file_2.csv',
+                                 base_path / 'inner_dir_2' / 'inner_dir_3' / 'file_1.csv',
+                                 base_path / 'inner_dir_2' / 'inner_dir_3' / 'file_2.csv',
+                                 base_path / 'inner_dir_2' / 'inner_dir_3',
+                                 base_path / 'inner_dir_2']),
                          result)
 
     async def test_success_file_recursive(self):
@@ -180,10 +180,6 @@ class ReadFileTestCase(BaseLocalFsManagerTestCase):
 
         sink = await self.manager.read_file(fd) >> SumAcc() >> Last()
 
-        @sink.bus.add_handler
-        async def log_handler(msg):
-            print(msg)
-        print('aaa')
         result = await sink.get_frame()
 
         self.assertEqual(result, path.read_bytes())
@@ -316,9 +312,9 @@ class ReadFilesTestCase(BaseLocalFsManagerTestCase):
         async with self.manager:
             result = [f async for f in stage]
 
-        self.assertEqual([f.full_path for f, _ in result],
-                         [(Path(__file__).parent / 'data' / 'file_1.csv').resolve(),
-                          (Path(__file__).parent / 'data' / 'file_2.csv').resolve()])
+        self.assertEqual(sorted([f.full_path for f, _ in result]),
+                         sorted([(Path(__file__).parent / 'data' / 'file_1.csv').resolve(),
+                                 (Path(__file__).parent / 'data' / 'file_2.csv').resolve()]))
 
         for f, s in result:
             self.assertIsInstance(s, BaseProducer, f)
