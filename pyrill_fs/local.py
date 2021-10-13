@@ -1,11 +1,16 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import BinaryIO, Final, Iterator, Optional, Union
+from typing import BinaryIO, Iterator, Optional, Union
 from urllib.parse import urlparse
 
 from pyrill import (BaseConsumer, BaseProducer, BaseSink, BaseSource,
-                    ChunksSlowStartSource)
+                    BytesChunksSlowStartSource)
+
+try:
+    from typing import Final
+except ImportError:
+    from typing_extensions import Final
 
 from .base import (BaseFsManager, FileDescription, FileDescriptionMixin,
                    ManagerSourceMixin)
@@ -17,7 +22,7 @@ __all__ = ['LocalFileDescription', 'LocalFsManager', 'LocalFileSource', 'LocalFi
 
 @dataclass(frozen=True)
 class LocalFileDescription(FileDescription):
-    protocol: Final[str] = 'file'
+    protocol: 'Final[str]' = 'file'
 
 
 class LocalFsManager(BaseFsManager[LocalFileDescription]):
@@ -125,7 +130,7 @@ class LocalListContent(ManagerSourceMixin[LocalFsManager],
 
 class LocalFileSource(ManagerSourceMixin[LocalFsManager],
                       FileDescriptionMixin[LocalFileDescription],
-                      ChunksSlowStartSource):
+                      BytesChunksSlowStartSource):
     _fd: Optional[BinaryIO] = None
 
     async def _next_chunk(self) -> bytes:

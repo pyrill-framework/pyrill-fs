@@ -27,6 +27,9 @@ if os.environ.get('PACKAGE_DEVELOPMENT') is not None:
 
 requirements = setup_utils.get_requirements_from_file(Path(__file__).parent / 'requirements.txt')
 
+s3_reqs = setup_utils.get_requirements_from_file(Path(__file__).parent / 'requirements-s3.txt')
+hdfs_reqs = setup_utils.get_requirements_from_file(Path(__file__).parent / 'requirements-hdfs.txt')
+
 setup(
     name=PACKAGE_NAME,
     url=PACKAGE_REPOSITORY,
@@ -43,6 +46,10 @@ setup(
         'Development Status :: 4 - Beta'],
     packages=find_packages(include=[f'{PACKAGE_DIR}*']),
     install_requires=requirements,
+    extras_require={":python_version<'3.8'": ["typing-extensions"],
+                    ":python_version<'3.7'": ["dataclasses", "async_exit_stack"],
+                    's3': s3_reqs,
+                    'hdfs': hdfs_reqs},
     description=PACKAGE_DESCRIPTION,
     long_description=(Path(__file__).parent / 'README.rst').read_text(),
     long_description_content_type='text/x-rst',
