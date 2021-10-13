@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from asyncio import (AbstractEventLoop, Condition, Future, ensure_future,
                      get_event_loop, iscoroutinefunction)
-from contextlib import AsyncExitStack
 from dataclasses import dataclass, field
 from enum import Enum
 from functools import wraps
@@ -9,6 +8,11 @@ from pathlib import Path
 from typing import Dict, Generic, Optional, Tuple, TypeVar, Union
 from urllib.parse import urlunparse
 from weakref import WeakSet
+
+try:
+    from contextlib import AsyncExitStack
+except ImportError:
+    from async_exit_stack import AsyncExitStack
 
 from pyrill import BaseProducer, BaseSink, BaseStage, Noop
 from pyrill.base import Source_co

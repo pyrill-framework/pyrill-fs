@@ -1,11 +1,16 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import AsyncIterator, Dict, Final, Iterable, List, Optional, Union
+from typing import AsyncIterator, Dict, Iterable, List, Optional, Union
 from urllib.parse import unquote, urlparse, urlunparse
 
 from pyrill import (BaseProducer, BaseSink, BaseSource,
                     BytesChunksSlowStartSource, FrameSkippedError)
+
+try:
+    from typing import Final
+except ImportError:
+    from typing_extensions import Final
 
 from ..base import (BaseFsManager, FileDescription, FileDescriptionMixin,
                     FileDescriptionType, ManagerSourceMixin)
@@ -21,7 +26,7 @@ __all__ = ['HDFSFileDescription', 'HDFSManager', 'HDFSFileSource', 'HDFSFileSink
 @dataclass(frozen=True)
 class HDFSFileDescription(FileDescription):
     host: str = ''
-    protocol: Final[str] = 'hdfs'
+    protocol: 'Final[str]' = 'hdfs'
 
     @property
     def uri(self) -> str:

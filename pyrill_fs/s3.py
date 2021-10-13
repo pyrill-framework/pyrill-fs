@@ -1,12 +1,17 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import AsyncIterator, Dict, Final, List, Optional
+from typing import AsyncIterator, Dict, List, Optional
 from urllib.parse import unquote, urlparse, urlunparse
 
 import aiobotocore
 from aiobotocore.client import AioBaseClient
 from pyrill import (BaseConsumer, BaseProducer, BaseSink, BaseSource,
                     BytesChunksSlowStart, BytesChunksSlowStartSource)
+
+try:
+    from typing import Final
+except ImportError:
+    from typing_extensions import Final
 
 from .base import (BaseFsManager, FileDescription, FileDescriptionMixin,
                    FileDescriptionType, ManagerSourceMixin)
@@ -19,7 +24,7 @@ __all__ = ['S3FileDescription', 'S3FsManager', 'S3FileSink', 'S3FileSource', 'S3
 @dataclass(frozen=True)
 class S3FileDescription(FileDescription):
     bucket: str = ''
-    protocol: Final[str] = 's3'
+    protocol: 'Final[str]' = 's3'
 
     @property
     def uri(self) -> str:
