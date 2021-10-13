@@ -1,7 +1,7 @@
-from .base import *  # noqa
-from .exceptions import *  # noqa
-from .hdfs import *  # noqa
-from .local import *  # noqa
-from .s3 import *  # noqa
+from .base import *
+from .exceptions import *
+from .hdfs import *
+from .local import *
+from .s3 import *
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
