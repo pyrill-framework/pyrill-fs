@@ -1,1 +1,1 @@
-aiobotocore
+aiobotocore>=2.0.0

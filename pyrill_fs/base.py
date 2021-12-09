@@ -70,7 +70,7 @@ class BaseFsManager(Generic[FileDescriptionType], ABC):
         self._context_collection = AsyncExitStack()
         self._open_fut: Optional[Future] = None
         self._close_fut: Optional[Future] = None
-        self._pendant_event: Condition = Condition(loop=self._loop)
+        self._pendant_event: Condition = Condition()
 
     @classmethod
     @abstractmethod
