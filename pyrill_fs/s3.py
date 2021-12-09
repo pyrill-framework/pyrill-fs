@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import AsyncIterator, Dict, List, Optional
 from urllib.parse import unquote, urlparse, urlunparse
 
-import aiobotocore
 from aiobotocore.client import AioBaseClient
+from aiobotocore.session import AioSession, get_session
 from pyrill import (BaseConsumer, BaseProducer, BaseSink, BaseSource,
                     BytesChunksSlowStart, BytesChunksSlowStartSource)
 
@@ -35,11 +35,11 @@ class S3FsManager(BaseFsManager[S3FileDescription]):
 
     def __init__(self,
                  *args,
-                 session: aiobotocore.AioSession = None,
+                 session: AioSession = None,
                  aws_params: Dict = None, **kwargs):
         super(S3FsManager, self).__init__(*args, **kwargs)
 
-        self._session = session or aiobotocore.get_session()
+        self._session = session or get_session()
         self._client: Optional[AioBaseClient] = None
         self._aws_params = aws_params or {}
 
